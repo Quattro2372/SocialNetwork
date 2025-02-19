@@ -1,0 +1,27 @@
+erDiagram
+    USERS ||--o{ USERS : has
+    USERS {
+        uint64 userId PK
+        string username
+        string passwordHash
+        string email
+        string phone
+    }
+    
+    USER_SESSIONS ||--o{ USER_SESSIONS : has
+    USER_SESSIONS {
+        uint64 sessionId PK
+        uint64 userId FK
+        bool terminated
+        uint64 terminationReason
+        uint64 lastLoginTime
+    }
+
+    USER_PROFILES ||--o{ USER_PROFILES : has
+    USER_PROFILES {
+        uint64 userId PK
+        string name
+        string surname
+        string photoUrl
+        uint64 updateTimestamp
+    }
