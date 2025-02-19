@@ -1,0 +1,30 @@
+erDiagram
+    POST_VIEWS ||--o{ POST_VIEWS : has
+    POST_VIEWS {
+        uint64 postId PK
+        uint64 userId
+        uint64 viewTimestamp
+        string ip
+        string userAgent
+    }
+    
+    USEER_METRICS ||--o{ USEER_METRICS : has
+    USEER_METRICS {
+        uint64 userId PK
+        uint64 totalPosts
+        uint64 totalLikesPut
+        uint64 totalLikesGot
+        uint64 totalCommentsWritten
+        uint64 totalCommentsGot
+        uint64 totalReactionsPut
+        uint64 totalReactionsGot
+    }
+
+    POST_LIKES ||--o{ POST_LIKES : has
+    POST_LIKES {
+        uint64 postId PK
+        uint64 userId
+        uint64 likeTimestamp
+        string ip
+        string userAgent
+    }
