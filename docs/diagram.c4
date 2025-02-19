@@ -1,0 +1,232 @@
+specification {
+  element user {
+    style {
+      shape person
+      color secondary
+    }
+  }
+  element UI
+  element api {
+    style {
+      icon gcp:api
+    }
+  }
+  element service {
+    style {
+      color green
+    }
+  }
+  element database {
+    style {
+      shape storage
+      color amber
+    }
+  }
+  element table
+  element column
+  element broker {
+    style {
+      shape queue
+      color indigo
+    }
+  }
+}
+
+model {
+  user = user 'User' {
+    description 'Our social netwrok user'
+  }
+
+
+
+  user_interface = UI 'User Interface' {
+    description 'Frontend that the user interacts with'
+  }
+
+
+
+  api = api 'API' {
+    description 'Gateway API that provides access to our service'
+  }
+
+
+
+  user_service = service 'User Service' {
+    style {
+      icon gcp:support
+    }
+    description 'Service responsible for user authentification and storing user data (email, phone, name etc)'
+  }
+
+  posts_service = service 'Posts Service' {
+    style {
+      icon gcp:filestore
+    }
+    description 'Service responsible for storing posts data (comments, likes, reactions) and updating statistics about posts'
+  }
+
+  statistics_service = service 'Statistics Service' {
+    style {
+      icon gcp:datalab
+    }
+    description 'Service responsible for counting statistics of posts (amount of comments, likes, reactions)'
+  }
+
+
+
+  user_service_db = database 'User Service Database' {
+    style {
+      icon tech:postgresql
+    }
+    description 'Database with User data'
+
+    table users {
+      column userId 'userId' 'uint64'
+      column username 'username' 'string'
+      column passwordHash 'passwordHash' 'string'
+      column email 'email' 'string'
+      column phone 'phone' 'string'
+    }
+
+    table user_sessions {
+      column sessionId 'sessionId' 'uint64'
+      column userId 'userId' 'uint64'
+      column lastLoginTimestamp 'lastLoginTime' 'uint64'
+      column terminated 'terminated' 'bool'
+      column terminationReason 'terminationReason' 'string'
+    }
+
+    table user_profiles {
+      column userId 'userId' 'uint64'
+      column name 'name' 'string'
+      column surname 'surname' 'string'
+      column photoUrl 'photoUrl' 'string'
+      column updateTimestamp 'updateTimestamp' 'uint64'
+    }
+  }
+
+  posts_service_db = database 'Posts Service Database' {
+    style {
+      icon tech:postgresql
+    }
+    description 'Database with Posts data'
+
+    table posts {
+      column postId 'postId' 'uint64'
+      column userId 'userId' 'uint64'
+      column creationTimestamp 'creationTimestamp' 'uint64'
+      column editingTimestamp 'editingTimestamp' 'uint64'
+      column viewsNumber 'viewsNumber' 'uint64'
+      column content 'content' 'string'
+      column likesNumber 'likesNumber' 'uint64'
+    }
+
+    table comments {
+      column commentId 'commentId' 'uint64'
+      column postId 'postId' 'uint64'
+      column userId 'userId' 'uint64'
+      column creationTimestamp 'creationTimestamp' 'uint64'
+      column editingTimestamp 'editingTimestamp' 'uint64'
+      column content 'content' 'string'
+    }
+
+    table reactions {
+      column reactionId 'reactionId' 'uint64'
+      column reactionType 'reactionType' 'uint64'
+      column userId 'userId' 'uint64'
+      column postId 'postId' 'uint64'
+      column creationTimestamp 'creationTimestamp' 'uint64'
+    }
+  }
+
+  statistics_service_db = database 'Statistics Service Database' {
+    style {
+      icon https://marketplace-assets.digitalocean.com/logos/clickhouse.svg
+    }
+    description 'Database with Statistics'
+
+    table post_views {
+      column postId 'postId' 'uint64'
+      column userId 'userId' 'uint64'
+      column viewTimestamp 'viewTimestamp' 'uint64'
+      column ip 'ip' 'string'
+      column userAgent 'userAgent' 'string'
+    }
+
+    table user_metrics {
+      column userId 'userId' 'uint64'
+      column totalPosts 'totalPosts' 'uint64'
+      column totalLikesPut 'totalLikesPut' 'uint64'
+      column totalLikesGot 'totalLikesGot' 'uint64'
+      column totalCommentsWritten 'totalCommentsWritten' 'uint64'
+      column totalCommentsGot 'totalCommentsGot' 'uint64'
+      column totalReactionsPut 'totalReactionsPut' 'uint64'
+      column totalReactionsGot 'totalReactionsGot' 'uint64'
+    }
+
+    table post_likes {
+      column postId 'postId' 'uint64'
+      column userId 'userId' 'uint64'
+      column likeTimestamp 'likeTimestamp' 'uint64'
+      column ip 'ip' 'string'
+      column userAgent 'userAgent' 'string'
+    }
+  }
+
+  message_broker = broker 'Message Broker' {
+    description 'Broker for interaction between Statistics and Post Services'
+  }
+
+  user -> user_interface 'Making posts, watching posts etc'
+
+  user_interface -> api 'Making HTTP requests'
+
+  api -> user_service 'Authentification and getting user data'
+  api -> posts_service 'Updating information about posts'
+  api -> statistics_service 'Requesting statistics of post'
+
+  user_service -> user_service_db 'Making requests to fetch or update data'
+  posts_service -> posts_service_db 'Making requests to fetch or update data'
+  statistics_service -> statistics_service_db 'Making requests to fetch or update data'
+
+  posts_service -> message_broker 'Pushing posts events'
+  statistics_service -> message_broker 'Getting posts events'
+}
+
+views {
+  view index {
+    title 'Landscape'
+    include *
+  }
+
+  view of user_service_db {
+    include *
+    include users.*
+    include user_sessions.*
+    include user_profiles.*
+    style users, user_sessions, user_profiles {
+      color gray
+    }
+  }
+
+  view of posts_service_db {
+    include *
+    include posts.*
+    include comments.*
+    include reactions.*
+    style posts, comments, reactions {
+      color gray
+    }
+  }
+
+  view of statistics_service_db {
+    include *
+    include post_views.*
+    include user_metrics.*
+    include post_likes.*
+    style post_views, user_metrics, post_likes {
+      color gray
+    }
+  }
+}
+
