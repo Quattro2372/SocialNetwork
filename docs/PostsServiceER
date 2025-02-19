@@ -1,0 +1,30 @@
+erDiagram
+    POSTS ||--o{ POSTS : has
+    POSTS {
+        uint64 postId PK
+        uint64 userId
+        uint64 creationTimestamp
+        uint64 editingTimestamp
+        uint64 viewsNumber
+        string content
+        uint64 likesNumber
+    }
+    
+    COMMENTS ||--o{ COMMENTS : has
+    COMMENTS {
+        uint64 commentId PK
+        uint64 postId
+        uint64 userId
+        uint64 creationTimestamp
+        uint64 editingTimestamp
+        string content
+    }
+
+    REACTIONS ||--o{ REACTIONS : has
+    REACTIONS {
+        uint64 reactionId PK
+        uint64 reactionType
+        uint64 userId
+        uint64 postId
+        uint64 creationTimestamp
+    }
