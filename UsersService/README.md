@@ -1,1 +1,1 @@
-Service responsible for user authentification and storing user data (email, phone, name etc)
+Service responsible for user authentication and storing user data (email, phone, name etc)
