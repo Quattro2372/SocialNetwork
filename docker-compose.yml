@@ -1,0 +1,63 @@
+services:
+  api-service:
+    build: API/
+    command: python3.13 -m fastapi dev main.py --host 0.0.0.0 --port 8000
+    ports:
+      - 8000:8000
+    environment:
+      USERSERVICE_PORT: 8001
+      USERSERVICE_HOSTNAME: user-service
+    depends_on:
+      - user-service
+
+  user-service:
+    build: UsersService/
+    command: python3.13 -m fastapi dev main.py --host 0.0.0.0 --port 8001
+    ports:
+      - 8001:8001
+    environment:
+      POSTGRES_URL: postgresql+psycopg2://postgres_user:postgres_password@postgres_user_service:1234/user_service_db
+    depends_on:
+      - postgres-user-service
+
+  postgres-user-service:
+    image: postgres:latest
+    container_name: postgres_user_service
+    environment:
+      POSTGRES_USER: postgres_user
+      POSTGRES_PASSWORD: postgres_password
+      POSTGRES_DB: user_service_db
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "1234:1234"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data/pgdata
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    command: >
+      postgres -c max_connections=1000
+               -c shared_buffers=256MB
+               -c effective_cache_size=768MB
+               -c maintenance_work_mem=64MB
+               -c checkpoint_completion_target=0.7
+               -c wal_buffers=16MB
+               -c default_statistics_target=100
+               -p 1234
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres_user -d userdata" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+
+volumes:
+  pgdata:
+    driver: local

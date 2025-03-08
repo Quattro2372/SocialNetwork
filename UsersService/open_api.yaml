@@ -1,0 +1,468 @@
+openapi: 3.1.0
+info:
+  title: User Service
+  version: 0.1.0
+paths:
+  /register_user:
+    post:
+      summary: Register User
+      operationId: register_user_register_user_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /auth_with_username:
+    post:
+      summary: Auth With Username
+      operationId: auth_with_username_auth_with_username_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthWithUsernameRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /auth_with_token:
+    post:
+      summary: Auth With Token
+      operationId: auth_with_token_auth_with_token_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthWithTokenRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /get_user_by_username:
+    post:
+      summary: Get User By Username
+      operationId: get_user_by_username_get_user_by_username_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetUserByUsernameRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /get_user_by_id:
+    post:
+      summary: Get User By Id
+      operationId: get_user_by_id_get_user_by_id_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetUserByIDRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /update_user:
+    post:
+      summary: Update User
+      operationId: update_user_update_user_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserUpdateResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserUpdateResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    AuthResponse:
+      properties:
+        error:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Error
+        auth_response_data:
+          anyOf:
+            - $ref: '#/components/schemas/AuthResponseData'
+            - type: 'null'
+      type: object
+      title: AuthResponse
+    AuthResponseData:
+      properties:
+        token:
+          anyOf:
+            - type: string
+              format: uuid
+            - type: 'null'
+          title: Token
+        user_id:
+          type: string
+          format: uuid
+          title: User Id
+      type: object
+      required:
+        - user_id
+      title: AuthResponseData
+    AuthWithTokenData:
+      properties:
+        token:
+          type: string
+          format: uuid
+          title: Token
+      type: object
+      required:
+        - token
+      title: AuthWithTokenData
+    AuthWithTokenRequest:
+      properties:
+        auth_data:
+          $ref: '#/components/schemas/AuthWithTokenData'
+      type: object
+      required:
+        - auth_data
+      title: AuthWithTokenRequest
+    AuthWithUsernameData:
+      properties:
+        username:
+          type: string
+          title: Username
+        password:
+          type: string
+          title: Password
+      type: object
+      required:
+        - username
+        - password
+      title: AuthWithUsernameData
+    AuthWithUsernameRequest:
+      properties:
+        auth_data:
+          $ref: '#/components/schemas/AuthWithUsernameData'
+      type: object
+      required:
+        - auth_data
+      title: AuthWithUsernameRequest
+    GetUserByIDRequest:
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          title: User Id
+      type: object
+      required:
+        - user_id
+      title: GetUserByIDRequest
+    GetUserByUsernameRequest:
+      properties:
+        username:
+          type: string
+          title: Username
+      type: object
+      required:
+        - username
+      title: GetUserByUsernameRequest
+    GetUserResponse:
+      properties:
+        error:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Error
+        user_data:
+          anyOf:
+            - $ref: '#/components/schemas/UserData'
+            - type: 'null'
+      type: object
+      title: GetUserResponse
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    RegistrationData:
+      properties:
+        username:
+          type: string
+          title: Username
+        email:
+          type: string
+          title: Email
+        password:
+          type: string
+          title: Password
+      type: object
+      required:
+        - username
+        - email
+        - password
+      title: RegistrationData
+    RegistrationRequest:
+      properties:
+        registration_data:
+          $ref: '#/components/schemas/RegistrationData'
+      type: object
+      required:
+        - registration_data
+      title: RegistrationRequest
+    RegistrationResponse:
+      properties:
+        error:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Error
+        auth_response_data:
+          anyOf:
+            - $ref: '#/components/schemas/AuthResponseData'
+            - type: 'null'
+      type: object
+      title: RegistrationResponse
+    UserData:
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          title: User Id
+        username:
+          type: string
+          title: Username
+        name:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Name
+        surname:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Surname
+        date_of_birth:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Date Of Birth
+        email:
+          type: string
+          title: Email
+        phone_number:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Phone Number
+        photo_url:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Photo Url
+        created_at:
+          type: integer
+          title: Created At
+        updated_at:
+          type: integer
+          title: Updated At
+      type: object
+      required:
+        - user_id
+        - username
+        - email
+        - created_at
+        - updated_at
+      title: UserData
+    UserUpdateData:
+      properties:
+        name:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Name
+        surname:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Surname
+        date_of_birth:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Date Of Birth
+        email:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Email
+        phone_number:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Phone Number
+        photo_url:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Photo Url
+      type: object
+      title: UserUpdateData
+    UserUpdateRequest:
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          title: User Id
+        user_update_data:
+          $ref: '#/components/schemas/UserUpdateData'
+      type: object
+      required:
+        - user_id
+        - user_update_data
+      title: UserUpdateRequest
+    UserUpdateResponse:
+      properties:
+        error:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Error
+      type: object
+      title: UserUpdateResponse
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+              - type: string
+              - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+        - loc
+        - msg
+        - type
+      title: ValidationError
